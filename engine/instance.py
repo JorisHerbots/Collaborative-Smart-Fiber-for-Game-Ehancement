@@ -1,4 +1,5 @@
 from .hardwaremanager import HardwareManager
+from . import config
 
 
 class InvalidTriggerException(Exception):
@@ -8,6 +9,9 @@ class Engine:
     def __init__(self, game_name="Unknown"):
         # Game Name this Engine represents
         self.game_name = game_name
+
+        # Configuration parameters
+        self.config = config
 
         # Dictionary of all triggers that correspond to a given event
         self.event_triggers = {}
@@ -20,7 +24,7 @@ class Engine:
 
         Decorator functionality event_trigger() available
 
-        :param event_name: alle event names should ideally be strings, if not they'll be converted to strings
+        :param event_name: all event names should ideally be strings, if not they'll be converted to strings
         :param trigger_pointer: method call for the trigger
         """
         event_name = str(event_name).lower()
