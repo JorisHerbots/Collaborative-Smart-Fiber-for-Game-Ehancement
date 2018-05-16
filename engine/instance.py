@@ -1,5 +1,5 @@
 from .hardwaremanager import HardwareManager
-from . import config
+from . import config, logger
 
 
 class InvalidTriggerException(Exception):
@@ -8,16 +8,21 @@ class InvalidTriggerException(Exception):
 class Engine:
     def __init__(self, game_name="Unknown"):
         # Game Name this Engine represents
-        self.game_name = game_name
+        self.game_name = str(game_name)
 
         # Configuration parameters
         self.config = config
+
+        # Logger
+        self.logger = logger.initiate_logger("engine.instance", self.config.debug)
 
         # Dictionary of all triggers that correspond to a given event
         self.event_triggers = {}
 
         # Hardware manager instance
         self.hardware_interface = HardwareManager()
+
+        self.logger.info("Engine initialised | Game name: \"{}\"".format(str(game_name)))
 
     def add_trigger(self, event_name, trigger_pointer):
         """Add a trigger to a given event name
@@ -33,6 +38,7 @@ class Engine:
 
         if trigger_pointer not in self.event_triggers[event_name]:
             self.event_triggers[event_name].append(trigger_pointer)
+            self.logger.info("Trigger [{}] initialised added for event [{}]".format(trigger_pointer, event_name))
 
     def register_trigger(self, event_name):
         """A decorator used to add a method as an event trigger
@@ -54,7 +60,8 @@ class Engine:
         triggers = self.event_triggers[event_name]
         for trigger in triggers:
             try:
+                self.logger.debug("Initiating trigger [{}] for event [{}] with parameters [{}]".format(trigger, event_name, event_args))
                 trigger(**event_args)
             except TypeError:
-                # TODO logging
+                self.logger.error("Could not call trigger {}".format(trigger))
                 raise InvalidTriggerException("{} does not accept the given arguments {} for event \"{}\"".format(trigger, event_args, event_name))
