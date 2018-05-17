@@ -1,7 +1,7 @@
 from enum import Enum
 from models.playermodel import PlayerModel, PlayerType
 import phases.startphase as StartPhase
-from phases.endphase import EndPhase
+import phases.endphase as EndPhase
 import phases.ingamephase as InGamePhase
 from engine import Engine
 
@@ -20,6 +20,8 @@ def startGame():
     activePhase = Phase.STARTPHASE
     # The timer that keeps track of the current running game
     gametimer = None
+
+    thieves_won = False
 
     @engine.register_trigger("onEntityRegistered")
     def onEntityRegistered(entity):
@@ -43,12 +45,21 @@ def startGame():
 
     def gameTimerEnded():
         print('Timer ended')
+        thieves_won = True
         # The timer of the game has ended and the thiefs haven't been caught, so thieves win!
+        # Trigger end game
 
     @engine.register_trigger("onGameStarted")
     def onGameStart():
         activePhase = Phase.INGAMEPHASE
         InGamePhase.startTimer(gameTimerEnded, gametimer)
+
+    @engine.register_trigger("onGameEnded")
+    def onGameEnded():
+        activePhase = Phase.ENDPHASE
+        if not thieves_won:
+            gametimer.cancel()
+        EndPhase.showEndGameState(thieves_won)
 
     @engine.register_trigger("buttonClicked")
     def onButtonClicked(id, entity, duration):
