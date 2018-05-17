@@ -4,7 +4,7 @@ import sys
 
 engine_default_logging_handler = logging.StreamHandler(sys.stdout)
 engine_default_logging_handler.setFormatter(logging.Formatter(
-    '[%(asctime)s | %(levelname)s] %(message)s'
+    '[%(asctime)s | %(levelname)s | %(module)s] %(message)s'
 ))
 
 

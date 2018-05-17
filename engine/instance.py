@@ -1,12 +1,13 @@
 from .hardwaremanager import HardwareManager
-from . import config, logger
+from . import config, logger, httpserver, configuration_parser
 
 
 class InvalidTriggerException(Exception):
     pass
 
+
 class Engine:
-    def __init__(self, game_name="Unknown"):
+    def __init__(self, game_name="Unknown", test_setup = False):
         # Game Name this Engine represents
         self.game_name = str(game_name)
 
@@ -14,7 +15,7 @@ class Engine:
         self.config = config
 
         # Logger
-        self.logger = logger.initiate_logger("engine.instance", self.config.debug)
+        self.logger = logger.initiate_logger("Engine", self.config.debug)
 
         # Dictionary of all triggers that correspond to a given event
         self.event_triggers = {}
@@ -22,7 +23,22 @@ class Engine:
         # Hardware manager instance
         self.hardware_interface = HardwareManager()
 
+        # Configuration parser instance
+        self.configuration_parser_instance = configuration_parser.setup_configuration_parser()
+
+        # HTTP server instance
+        self.http_server_instance = httpserver.run_server(self.configuration_parser_instance.configuration_queue) # TODO PARAMS HERE (Given @ boot??)
+
         self.logger.info("Engine initialised | Game name: \"{}\"".format(str(game_name)))
+
+        # Only do an immediate shutdown of all interfaces when in a test_setup is run
+        if test_setup:
+            self.cleanup_interfaces()
+
+    def cleanup_interfaces(self):
+        self.logger.info("Cleaning up Engine interfaces running on separate threads.")
+        httpserver.stop_server(self.http_server_instance)
+        configuration_parser.stop_queue_processing(self.configuration_parser_instance)
 
     def add_trigger(self, event_name, trigger_pointer):
         """Add a trigger to a given event name
