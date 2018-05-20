@@ -48,3 +48,13 @@ class HardwareManager:
         #         _logger.warning("Fault component configuration found during parsing. (Name missing or wrong?) | {}"
         #                         .format(component_config))
 
+
+def create_lookup_list(*components):
+    """Create a list from all component modules
+
+    Universal way of creating a lookup table for components
+        In case module namings change, this list creator assures compatibility
+    :param components: argument list of python modules (from hardware)
+    :return: list of all component names
+    """
+    return [str(component._name_id) for component in components]

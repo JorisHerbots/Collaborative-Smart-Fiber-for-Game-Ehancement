@@ -1,4 +1,5 @@
 from .hardwaremanager import HardwareManager
+from .entitymanager import EntityManager
 from . import config, logger, httpserver, configuration_parser
 
 
@@ -23,11 +24,14 @@ class Engine:
         # Hardware manager instance
         self.hardware_interface = HardwareManager()
 
+        # Entity manager instance
+        self.entitymanager_interface = EntityManager()
+
         # Configuration parser instance
         self.configuration_parser_instance = configuration_parser.setup_configuration_parser(self.hardware_interface)
 
         # HTTP server instance
-        self.http_server_instance = httpserver.run_server(self.configuration_parser_instance.configuration_queue) # TODO PARAMS HERE (Given @ boot??)
+        self.http_server_instance = httpserver.run_server(self.configuration_parser_instance.configuration_queue, self.entitymanager_interface) # TODO PARAMS HERE (Given @ boot??)
 
         self.logger.info("Engine initialised | Game name: \"{}\"".format(str(game_name)))
 
