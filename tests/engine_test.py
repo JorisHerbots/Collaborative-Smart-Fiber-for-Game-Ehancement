@@ -62,5 +62,6 @@ def test_triggers():
 
     engine.initiate_event("demo_event", {"a": None, "b": None, "c": None})
 
-    with pytest.raises(InvalidTriggerException):
-        engine.initiate_event("demo_event", {})
+    # Removed
+    # with pytest.raises(InvalidTriggerException):
+    #     engine.initiate_event("demo_event", {})
