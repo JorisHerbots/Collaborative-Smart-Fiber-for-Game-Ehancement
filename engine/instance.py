@@ -24,7 +24,7 @@ class Engine:
         self.hardware_interface = HardwareManager()
 
         # Configuration parser instance
-        self.configuration_parser_instance = configuration_parser.setup_configuration_parser()
+        self.configuration_parser_instance = configuration_parser.setup_configuration_parser(self.hardware_interface)
 
         # HTTP server instance
         self.http_server_instance = httpserver.run_server(self.configuration_parser_instance.configuration_queue) # TODO PARAMS HERE (Given @ boot??)
@@ -76,8 +76,11 @@ class Engine:
         triggers = self.event_triggers[event_name]
         for trigger in triggers:
             try:
-                self.logger.debug("Initiating trigger [{}] for event [{}] with parameters [{}]".format(trigger, event_name, event_args))
+                self.logger.debug("Initiating trigger [{}] for event [{}] with parameters [{}]".format(trigger,
+                                                                                                       event_name,
+                                                                                                       event_args))
                 trigger(**event_args)
             except TypeError:
                 self.logger.error("Could not call trigger {}".format(trigger))
-                raise InvalidTriggerException("{} does not accept the given arguments {} for event \"{}\"".format(trigger, event_args, event_name))
+                raise InvalidTriggerException("{} does not accept the given arguments {} for event \"{}\"".format(
+                    trigger, event_args, event_name))

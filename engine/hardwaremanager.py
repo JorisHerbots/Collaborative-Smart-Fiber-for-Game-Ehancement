@@ -1,4 +1,9 @@
-from .hardware import led,three_button,vibration_motor
+from .hardware import led, three_button, vibration_motor
+from .logger import initiate_logger
+from . import config
+
+
+_logger = initiate_logger(__name__, config.debug)
 
 
 class HardwareMethodNotImplementedException(Exception):
@@ -14,7 +19,7 @@ class HardwareManager:
         self.hardware_configuration_parsers = {}
         for component in self.hardware_list:
             try:
-                self.hardware_configuration_parsers[component._name] = component.parse_config
+                self.hardware_configuration_parsers[component._name_id] = component.parse_config
             except NameError:
                 raise HardwareMethodNotImplementedException("{} does not contain a _name variable and/or parse_config "
                                                             "method".format_map(str(component)))
@@ -33,4 +38,13 @@ class HardwareManager:
         :param json_config:
         :return: dictionary of all found events
         """
-        pass
+        if json_config is None:
+            return {}
+
+        # for component_config in json_config:
+        #     if component_config.get("name") is not None and component_config["name"] in self.hardware_list:
+        #         self.hardware_list[component_config["name"]](component_config)
+        #     else:
+        #         _logger.warning("Fault component configuration found during parsing. (Name missing or wrong?) | {}"
+        #                         .format(component_config))
+
