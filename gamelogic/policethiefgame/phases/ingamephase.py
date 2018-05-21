@@ -11,7 +11,7 @@ def on_button_clicked(id, entity, duration, players, engine):
 
 def on_thief_pressed(player, players, engine):
     player.type = PlayerType.CAUGHT
-    # Use library to change color of the player and set the state
+    # Use library to change color of the models and set the state
     for item in players:
         if item.type == PlayerType.THIEF:
             return

@@ -16,7 +16,7 @@ class Phase(Enum):
 engine = Engine("PoliceThief", test_setup= True)
 # A list of players of type PlayerModel
 players = []
-# Map counts of player teams: thiefs, policemen
+# Map counts of models teams: thiefs, policemen
 counts = [0,0]
 # The currently active phase that will decide the behavior of the system
 activePhase = Phase.STARTPHASE
@@ -25,12 +25,14 @@ gametimer = None
 
 thieves_won = False
 
+
 def reset():
     global players, counts, activePhase, gametimer
     players = []
     counts = [0, 0]
     activePhase = Phase.STARTPHASE
     gametimer = None
+
 
 def game_timer_ended():
     print('Timer ended')
@@ -43,23 +45,24 @@ def game_timer_ended():
 def on_entity_registered(id):
     """
         When an entity is registered.
-        Add the entity as player and put it in either the team of policemen or thiefs.
+        Add the entity as models and put it in either the team of policemen or thiefs.
     :param entity:
     :return:
     """
-    # If the player is already registered, there is probably a network fault.
+    # If the models is already registered, there is probably a network fault.
     for player in players:
         if player.id == id:
             return
 
-    # When there are less thieves than policemen, the new player becomes a thief and vice versa.
+    # When there are less thieves than policemen, the new models becomes a thief and vice versa.
     if counts[0] <= counts[1]:
         players.append(PlayerModel(id, PlayerType.THIEF))
         counts[0] += 1
     else:
         players.append(PlayerModel(id, PlayerType.POLICE))
         counts[1] += 1
-    # Change leds of player to new color
+    # Change leds of models to new color
+
 
 @engine.register_trigger("game_started")
 def on_game_started():

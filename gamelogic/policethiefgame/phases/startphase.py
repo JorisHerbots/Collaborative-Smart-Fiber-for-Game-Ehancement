@@ -16,4 +16,4 @@ def switch_player_team(player, counts):
         player.type = PlayerType.THIEF
         counts[0] += 1
         counts[1] -= 1
-    # Change leds of player to new color
+    # Change leds of models to new color
