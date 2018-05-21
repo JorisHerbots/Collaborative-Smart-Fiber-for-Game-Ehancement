@@ -10,6 +10,7 @@ class Phase(Enum):
     INGAMEPHASE = 2
     ENDPHASE = 3
 
+
 def startGame():
     engine = Engine("PoliceThief")
     # A list of players of type PlayerModel
@@ -35,6 +36,7 @@ def startGame():
         for player in players:
             if player.id == entity.id:
                 return
+
         # When there are less thieves than policemen, the new player becomes a thief and vice versa.
         if counts[0] <= counts[1]:
             players.append(PlayerModel(entity.id, PlayerType.THIEF))
@@ -45,7 +47,6 @@ def startGame():
 
     def gameTimerEnded():
         print('Timer ended')
-        thieves_won = True
         # The timer of the game has ended and the thiefs haven't been caught, so thieves win!
         # Trigger end game
 
@@ -70,5 +71,6 @@ def startGame():
 
     engine.initiate_event("buttonClicked", {"id": None, "entity": {"id": 1}, "duration": None})
     engine.initiate_event("onGameStarted", {})
+
 
 startGame()
