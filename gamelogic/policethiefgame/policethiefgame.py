@@ -3,6 +3,7 @@ from .models.playermodel import PlayerModel, PlayerType
 import gamelogic.policethiefgame.phases.startphase as startphase
 import gamelogic.policethiefgame.phases.endphase as endphase
 import gamelogic.policethiefgame.phases.ingamephase as ingamephase
+import threading as thread
 from engine import Engine
 
 
@@ -24,6 +25,20 @@ gametimer = None
 
 thieves_won = False
 
+def reset():
+    global players, counts, activePhase, gametimer
+    players = []
+    counts = [0, 0]
+    activePhase = Phase.STARTPHASE
+    gametimer = None
+
+def game_timer_ended():
+    print('Timer ended')
+    # The timer of the game has ended and the thiefs haven't been caught, so thieves win!
+    # Trigger end game
+    engine.initiate_event("game_ended", {})
+
+
 @engine.register_trigger("on_entity_registered")
 def on_entity_registered(id):
     """
@@ -44,22 +59,24 @@ def on_entity_registered(id):
     else:
         players.append(PlayerModel(id, PlayerType.POLICE))
         counts[1] += 1
-
-
-def game_timer_ended():
-    print('Timer ended')
-    # The timer of the game has ended and the thiefs haven't been caught, so thieves win!
-    # Trigger end game
-
+    # Change leds of player to new color
 
 @engine.register_trigger("game_started")
 def on_game_started():
+    global gametimer, activePhase
     activePhase = Phase.INGAMEPHASE
-    ingamephase.startTimer(game_timer_ended(), gametimer)
+    if gametimer is not None:
+        gametimer.cancel()
+    # Run the game timer for 15 minutes
+    gametimer = thread.Timer(5, game_timer_ended)
+
+    print("Timer started.")
+    gametimer.start()
 
 
-@engine.register_trigger("on_game_ended")
-def on_gamed_ended():
+@engine.register_trigger("game_ended")
+def on_game_ended():
+    global activePhase
     activePhase = Phase.ENDPHASE
     if not thieves_won:
         gametimer.cancel()
@@ -69,7 +86,7 @@ def on_gamed_ended():
 @engine.register_trigger("button_clicked")
 def on_button_clicked(id, entity, duration):
     if activePhase == Phase.STARTPHASE:
-        startphase.onButtonClicked(id,entity, duration, players, counts)
+        startphase.on_button_clicked(id, entity, duration, players, counts)
     elif activePhase == Phase.INGAMEPHASE:
-        ingamephase.onButtonClicked(id, entity, duration, players, timer)
+        ingamephase.on_button_clicked(id, entity, duration, players, engine)
 
