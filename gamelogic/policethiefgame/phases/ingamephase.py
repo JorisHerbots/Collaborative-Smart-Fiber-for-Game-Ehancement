@@ -1,4 +1,4 @@
-from models.playermodel import PlayerType
+from gamelogic.policethiefgame.models.playermodel import PlayerType
 import threading as thread
 
 def startTimer(func, timer):

@@ -1,4 +1,4 @@
-from models.playermodel import PlayerType
+from gamelogic.policethiefgame.models.playermodel import PlayerType
 
 def onButtonClicked(id, entity, duration, players, counts):
     for player in players:
