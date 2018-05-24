@@ -36,16 +36,18 @@ def create_handler_class_with_queue(queue, entitymanager_interface):
             # POST payload
             payload_as_string = self.rfile.read(int(self.headers['Content-Length'])).decode('utf-8')
 
-            if not self.entitymanager_interface.does_entity_exist(self.client_address[0]):
+            client_ipv4 = self.client_address[0]
+            if not self.entitymanager_interface.does_entity_exist(client_ipv4):
                 try:
-                    self.entitymanager_interface.register_entity(self.client_address[0], payload_as_string)
+                    self.entitymanager_interface.register_entity(client_ipv4, payload_as_string)
                     self._set_headers(200)
                     self.wfile.write(b"new entity registered")
                 except entitymanager.EntityRegistrationException as e:
                     self._set_headers(400)
                     self.wfile.write(b"{}".format(e))
             else:
-                self.queue.put(payload_as_string)
+                self.queue.put({"entity": self.entitymanager_interface.known_entities.get(client_ipv4),
+                                "payload": payload_as_string})
                 self._set_headers(200)
                 self.wfile.write("new payload received")
 

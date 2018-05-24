@@ -1,8 +1,19 @@
+from .logger import initiate_logger
+from . import config
+
+
+_logger = initiate_logger(__name__, config.debug)
+
+
 class EntityRegistrationException(Exception):
     pass
 
 
 class MalformedRegisterPayloadException(Exception):
+    pass
+
+
+class UniqueIdUnknownException(Exception):
     pass
 
 
@@ -16,17 +27,29 @@ class Entity:
 
         # Installed components with their ID(s)
         self.ipv4_address = str(ipv4_address)
-        self.components = {}
+        self.connected_components = {}
+        self._unique_id_to_module_id = {}
         components = str(raw_registration_string).split("\n")
         try:
             for component in components:
                 module_id, unique_id = component.split('|')
-                if module_id not in self.components:
-                    self.components[module_id] = []
-                self.components[module_id].append(unique_id)
+                if module_id not in self.connected_components:
+                    self.connected_components[module_id] = []
+                self.connected_components[module_id].append(unique_id)
+
+                if unique_id not in self._unique_id_to_module_id:
+                    self._unique_id_to_module_id[unique_id] = module_id
+                else:
+                    _logger.warning("Double registration event discovered, ignoring entry. | Unique ID [{}] | Module "
+                                    "ID [{}]".format(unique_id, module_id))
+
         except ValueError:
             raise MalformedRegisterPayloadException("Given payload contains malformed data | {}"
                                                     .format(raw_registration_string))
+
+    def __str__(self):
+        return "Entity(ipv4_address: {}, connected_components: {}, component_to_module_mapping: {})"\
+            .format(str(self.ipv4_address), str(self.connected_components), str(self._unique_id_to_module_id))
 
     def has_components(self, components):
         """Check for presence of given component(s)
@@ -38,7 +61,20 @@ class Entity:
         #     if comp not in self.components.keys():
         #         return False
         # return True
-        return len(list(set(components) - set(self.components.keys()))) == 0
+        return len(list(set(components) - set(self.connected_components.keys()))) == 0
+
+    def get_module_id_from_unique_id(self, unique_id):
+        """Retrieve the module corresponding to the unique ID given by a client
+
+        Throws an exception when the unique ID doesn't exist
+
+        :param unique_id:
+        :return:
+        """
+        unique_id = str(unique_id)
+        if unique_id not in self._unique_id_to_module_id:
+            raise UniqueIdUnknownException("{} unknown".format(unique_id))
+        return self._unique_id_to_module_id[unique_id]
 
 
 class EntityManager:

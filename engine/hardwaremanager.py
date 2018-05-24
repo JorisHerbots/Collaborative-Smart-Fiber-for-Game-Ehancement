@@ -1,12 +1,16 @@
 from .hardware import led, three_button, vibration_motor
 from .logger import initiate_logger
-from . import config
+from . import config, entitymanager
 
 
 _logger = initiate_logger(__name__, config.debug)
 
 
 class HardwareMethodNotImplementedException(Exception):
+    pass
+
+
+class HardwareComponentUnknownYetExisting(Exception):
     pass
 
 
@@ -24,8 +28,8 @@ class HardwareManager:
                 raise HardwareMethodNotImplementedException("{} does not contain a _name variable and/or parse_config "
                                                             "method".format_map(str(component)))
 
-    def find_events(self, json_config):
-        """Walk through a JSON configuration and find all possible events
+    def find_events(self, entity, payload):
+        """Walk through a client configuration and find all possible events
 
         Every single hardware component module contains a parser_config() method
                 parser_config() is the hardcoded logic that will look for certain types of configurations and extract
@@ -38,15 +42,39 @@ class HardwareManager:
         :param json_config:
         :return: dictionary of all found events
         """
-        if json_config is None:
+        if entity is None:
+            _logger.error("HardwareManager has received an undefined entity as source. Should not be possible!! | "
+                          "Entity [{}] | Payload [{}]".format(str(entity), str(payload)))
+            return {}
+        if payload is None or payload == "":
+            _logger.warning("HardwareManager has received an empty payload from source. | Entity [{}] | Payload [{}]"
+                            .format(entity, payload))
             return {}
 
-        # for component_config in json_config:
-        #     if component_config.get("name") is not None and component_config["name"] in self.hardware_list:
-        #         self.hardware_list[component_config["name"]](component_config)
-        #     else:
-        #         _logger.warning("Fault component configuration found during parsing. (Name missing or wrong?) | {}"
-        #                         .format(component_config))
+        # Payload could contain multiple entries separated by a "\n"
+        split_payload = str(payload).split("\n")
+        for singular_payload in split_payload:
+            _logger.debug("Processing raw singular payload data | [{}]".format(singular_payload))
+
+            # All payload data is separated by pipes
+            singular_payload_data = singular_payload.split("|")
+
+            # Determine where this event originated from
+            # Every entity has a list of unique ID's which are linked to a certain module
+            # This unique ID is always assumed to be the first entry in a payload
+            try:
+                module_id = entity.get_module_id_from_unique_id(singular_payload_data[0])
+                _logger.debug("Hardwaremanager was able to retrieve a module ID from a client payload unique ID | "
+                              "Module ID [{}] | Unique ID [{}]".format(module_id, singular_payload_data[0]))
+
+                if module_id not in self.hardware_configuration_parsers:
+                    raise HardwareComponentUnknownYetExisting("Module ID \"{}\"".format(module_id))
+                self.hardware_configuration_parsers[module_id](singular_payload_data)
+
+            except entitymanager.UniqueIdUnknownException:
+                _logger.error("Entity issued a call with an unknown unique ID. Did hardware change? Did a new "
+                              "component not register correctly? Ignoring payload. | Entity [{}] | Payload [{}]"
+                              .format(entity, singular_payload_data))
 
 
 def create_lookup_list(*components):

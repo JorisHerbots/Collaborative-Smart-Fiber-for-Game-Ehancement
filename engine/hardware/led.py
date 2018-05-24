@@ -10,7 +10,7 @@ class State(Enum):
     FLASHING = 2
 
 
-def parse_config(raw_config):
+def parse_config(split_config):
     pass
 
 

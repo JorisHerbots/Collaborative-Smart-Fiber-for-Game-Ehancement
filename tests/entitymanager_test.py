@@ -12,7 +12,7 @@ def test_registration():
         assert r1.status_code == 200
         assert len(e.entitymanager_interface.known_entities) == 1
         components = e.entitymanager_interface.known_entities[list(e.entitymanager_interface.known_entities.keys())[0]]\
-            .components
+            .connected_components
         assert len(components) == 2
         assert '0' in components["0"]
         assert '2' in components["0"]

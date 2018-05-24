@@ -33,7 +33,8 @@ class Engine:
         self.entitymanager_interface = EntityManager()
 
         # Configuration parser instance
-        self.configuration_parser_instance = configuration_parser.setup_configuration_parser(self.hardware_interface)
+        self.configuration_parser_instance = configuration_parser.setup_configuration_parser(self.hardware_interface,
+                                                                                             self.event_queue)
 
         # HTTP server instance
         self.http_server_instance = httpserver.run_server(self.configuration_parser_instance.configuration_queue,
