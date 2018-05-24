@@ -47,6 +47,9 @@ class Entity:
             raise MalformedRegisterPayloadException("Given payload contains malformed data | {}"
                                                     .format(raw_registration_string))
 
+    def __repr__(self):
+        return self.__str__()
+
     def __str__(self):
         return "Entity(ipv4_address: {}, connected_components: {}, component_to_module_mapping: {})"\
             .format(str(self.ipv4_address), str(self.connected_components), str(self._unique_id_to_module_id))

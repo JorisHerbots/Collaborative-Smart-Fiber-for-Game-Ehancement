@@ -23,7 +23,7 @@ class HardwareManager:
         self.hardware_configuration_parsers = {}
         for component in self.hardware_list:
             try:
-                self.hardware_configuration_parsers[component._name_id] = component.parse_config
+                self.hardware_configuration_parsers[str(component._name_id)] = component.parse_config
             except NameError:
                 raise HardwareMethodNotImplementedException("{} does not contain a _name variable and/or parse_config "
                                                             "method".format_map(str(component)))
@@ -52,7 +52,8 @@ class HardwareManager:
             return {}
 
         # Payload could contain multiple entries separated by a "\n"
-        split_payload = str(payload).split("\n")
+        #split_payload = str(payload).split("\n")
+        split_payload = str(payload).replace("\\n", "\n").splitlines()
         for singular_payload in split_payload:
             _logger.debug("Processing raw singular payload data | [{}]".format(singular_payload))
 
@@ -68,7 +69,9 @@ class HardwareManager:
                               "Module ID [{}] | Unique ID [{}]".format(module_id, singular_payload_data[0]))
 
                 if module_id not in self.hardware_configuration_parsers:
-                    raise HardwareComponentUnknownYetExisting("Module ID \"{}\"".format(module_id))
+                    raise HardwareComponentUnknownYetExisting("Module ID \"{}\" not known to Hardware Manager, "
+                                                              "yet found in an entity. | Hardware {}"
+                                                              .format(module_id, self.hardware_configuration_parsers))
                 self.hardware_configuration_parsers[module_id](singular_payload_data)
 
             except entitymanager.UniqueIdUnknownException:

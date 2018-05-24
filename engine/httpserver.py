@@ -44,12 +44,12 @@ def create_handler_class_with_queue(queue, entitymanager_interface):
                     self.wfile.write(b"new entity registered")
                 except entitymanager.EntityRegistrationException as e:
                     self._set_headers(400)
-                    self.wfile.write(b"{}".format(e))
+                    self.wfile.write("{}".format(e).encode())
             else:
                 self.queue.put({"entity": self.entitymanager_interface.known_entities.get(client_ipv4),
                                 "payload": payload_as_string})
                 self._set_headers(200)
-                self.wfile.write("new payload received")
+                self.wfile.write(b"new payload received")
 
     return EngineHTTPHandler
 
