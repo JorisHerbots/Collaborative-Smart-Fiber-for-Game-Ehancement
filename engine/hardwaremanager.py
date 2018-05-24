@@ -40,20 +40,22 @@ class HardwareManager:
                 As a good practise, all events should be documented.
 
         :param json_config:
-        :return: dictionary of all found events
+        :return: list of all found events(in the form of a dictionary: {event: name, args: argsdict})
         """
         if entity is None:
             _logger.error("HardwareManager has received an undefined entity as source. Should not be possible!! | "
                           "Entity [{}] | Payload [{}]".format(str(entity), str(payload)))
-            return {}
+            return []
         if payload is None or payload == "":
             _logger.warning("HardwareManager has received an empty payload from source. | Entity [{}] | Payload [{}]"
                             .format(entity, payload))
-            return {}
+            return []
 
         # Payload could contain multiple entries separated by a "\n"
         #split_payload = str(payload).split("\n")
         split_payload = str(payload).replace("\\n", "\n").splitlines()
+
+        events = []
         for singular_payload in split_payload:
             _logger.debug("Processing raw singular payload data | [{}]".format(singular_payload))
 
@@ -72,12 +74,18 @@ class HardwareManager:
                     raise HardwareComponentUnknownYetExisting("Module ID \"{}\" not known to Hardware Manager, "
                                                               "yet found in an entity. | Hardware {}"
                                                               .format(module_id, self.hardware_configuration_parsers))
-                self.hardware_configuration_parsers[module_id](singular_payload_data)
+                module_event_data = self.hardware_configuration_parsers[module_id](singular_payload_data)
+                try:
+                    events.extend(module_event_data)
+                except Exception:
+                    _logger.error("Couldn't extend event list. Module most probably didn't return a list. | Module "
+                                  "event data [{}]".format(module_event_data))
 
             except entitymanager.UniqueIdUnknownException:
                 _logger.error("Entity issued a call with an unknown unique ID. Did hardware change? Did a new "
                               "component not register correctly? Ignoring payload. | Entity [{}] | Payload [{}]"
                               .format(entity, singular_payload_data))
+        return events
 
 
 def create_lookup_list(*components):
