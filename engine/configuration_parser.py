@@ -35,10 +35,11 @@ class ConfigurationParser:
 
             try:
                 events = hardware_interface.find_events(queue_item.get("entity"), queue_item.get("payload"))
-                _logger.debug("Hardware interface returned event list. | Raw payload [{}] | Event data [{}]"
-                              .format(queue_item.get("payload"), events))
-                [event_queue.put({"event_name": event.get("name"),
-                                  "event_args": event.get("args")}) for event in events]
+                _logger.debug("Hardware interface returned event list. | Event data [{}] | Raw payload [{}]"
+                              .format(events, queue_item.get("payload")))
+
+                for event in events:
+                    event_queue.put({"event_name": event.get("name"), "event_args": event.get("args")})
             except Exception as e:
                 _logger.warning("Couldn't parse a configuration from a client. | {}".format(e))
 

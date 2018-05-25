@@ -75,6 +75,10 @@ class HardwareManager:
                                                               "yet found in an entity. | Hardware {}"
                                                               .format(module_id, self.hardware_configuration_parsers))
                 module_event_data = self.hardware_configuration_parsers[module_id](singular_payload_data)
+                for event in module_event_data:
+                    if not event.get("args"):
+                        continue
+                    event["args"]["entity"] = entity
                 try:
                     events.extend(module_event_data)
                 except Exception:

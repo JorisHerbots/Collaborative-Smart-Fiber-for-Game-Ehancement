@@ -70,7 +70,7 @@ class Engine:
 
         if trigger_pointer not in self.event_triggers[event_name]:
             self.event_triggers[event_name].append(trigger_pointer)
-            self.logger.info("Trigger [{}] initialised added for event [{}]".format(trigger_pointer, event_name))
+            self.logger.info("Trigger [{}] initialised for event [{}]".format(trigger_pointer, event_name))
 
     def register_trigger(self, event_name):
         """A decorator used to add a method as an event trigger
@@ -102,10 +102,12 @@ class Engine:
         while True:
             event = self.event_queue.get()
             if event == "STOP_EVENT_QUEUE":
+                self.logger.debug("Event processor received HALT request, halting now.")
                 return
 
             event_name = str(event.get("event_name")).lower()
             event_args = event.get("event_args")
+            self.logger.debug("New event found | Name [{}] | Args [{}]".format(event_name, event_args))
 
             if event_name not in self.event_triggers:
                 continue
