@@ -1,6 +1,7 @@
 from enum import Enum
 
 _name = "Led"
+_name_id = 1
 
 
 class State(Enum):
@@ -9,7 +10,7 @@ class State(Enum):
     FLASHING = 2
 
 
-def parse_config(json_config):
+def parse_config(split_config):
     pass
 
 
