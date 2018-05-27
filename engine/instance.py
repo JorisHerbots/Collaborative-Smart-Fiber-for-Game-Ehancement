@@ -10,7 +10,7 @@ class InvalidTriggerException(Exception):
 
 
 class Engine:
-    def __init__(self, game_name="Unknown", test_setup = False):
+    def __init__(self, game_name="Unknown", _test_setup = False):
         # Game Name this Engine represents
         self.game_name = str(game_name)
 
@@ -47,7 +47,7 @@ class Engine:
         Thread(target=self._process_events).start()
 
         # Only do an immediate shutdown of all interfaces when in a test_setup is run
-        if test_setup:
+        if _test_setup:
             self.cleanup_interfaces()
 
     def cleanup_interfaces(self):

@@ -1,4 +1,5 @@
 from .logger import initiate_logger
+from threading import Lock
 from . import config
 
 
@@ -17,6 +18,10 @@ class UniqueIdUnknownException(Exception):
     pass
 
 
+class ModuleIdUnknownException(Exception):
+    pass
+
+
 class Entity:
     def __init__(self, ipv4_address, raw_registration_string):
         """Create an entity based upon the registration data
@@ -25,11 +30,19 @@ class Entity:
         :param raw_registration_string: MODULE_ID|UNIQUE_ID\nMODULE_ID|UNIQUE_ID\n...
         """
 
-        # Installed components with their ID(s)
+        # IPV4 address, used for internal checking (not intended as identifier)
         self.ipv4_address = str(ipv4_address)
+
+        # Installed components with their ID(s)
         self.connected_components = {}
         self._unique_id_to_module_id = {}
-        components = str(raw_registration_string).split("\n")
+
+        # Hardware command log
+        self._command_backlog_mutex = Lock()
+        self._command_backlog = []
+
+        # Discover modules with their corresponding Unique IDs from the raw registration string
+        components = str(raw_registration_string).replace("\\n", "\n").split("\n")
         try:
             for component in components:
                 module_id, unique_id = component.split('|')
@@ -46,6 +59,34 @@ class Entity:
         except ValueError:
             raise MalformedRegisterPayloadException("Given payload contains malformed data | {}"
                                                     .format(raw_registration_string))
+
+    def send_command(self, command, module_id):
+        """Send command to client
+
+        Will append command (as a string) to the backlog of build up commands.
+        No guarantees can be given on timings. Commands will be send over when the entity hardware polls for them.
+
+        Entity automatically prepends the correct unique_id to the command based on the given module_id
+
+        :param module_id: id from module given command was generated from; entity will search for corresponding uniqueID
+        :param command: Command in the form of a string (Advised to use hardware modules to generate these commands)
+        """
+        full_command = "{}|{}".format(self.get_unique_id_from_module_id(module_id), command)
+
+        with self._command_backlog_mutex:
+            self._command_backlog.append(str(full_command))
+
+    def pop_all_command(self):
+        """Pop the command backlog
+
+        Note: Will reset the backlog to an empty list
+
+        :return: list of all commands as strings
+        """
+        with self._command_backlog_mutex:
+            backlog_copy = self._command_backlog
+            self._command_backlog = []
+        return backlog_copy
 
     def __repr__(self):
         return self.__str__()
@@ -72,12 +113,28 @@ class Entity:
         Throws an exception when the unique ID doesn't exist
 
         :param unique_id:
-        :return:
+        :return: module ID if present; throws and UniqueIdUnknownException when nothing is found
         """
         unique_id = str(unique_id)
         if unique_id not in self._unique_id_to_module_id:
             raise UniqueIdUnknownException("{} unknown".format(unique_id))
         return self._unique_id_to_module_id[unique_id]
+
+    def get_unique_id_from_module_id(self, module_id):
+        """Retrieve the unique ID from the given unique ID
+
+        In case of multiple hardware pieces with the same module ID, the first one ever registered will get selected
+        FUTURE TODO: Allow more control over which unique ID to retrieve
+
+        :param module_id:
+        :return: unique id
+        """
+        module_id = str(module_id)
+        if module_id not in self.connected_components:
+            raise ModuleIdUnknownException("{} unknown".format(module_id))
+        # Since a module can only be registered in combination with a unique ID
+            # we can always assume that index 0 is present
+        return self.connected_components[module_id][0]
 
 
 class EntityManager:
