@@ -10,7 +10,7 @@ class InvalidTriggerException(Exception):
 
 
 class Engine:
-    def __init__(self, game_name="Unknown", test_setup = False):
+    def __init__(self, game_name="Unknown", _test_setup = False):
         # Game Name this Engine represents
         self.game_name = str(game_name)
 
