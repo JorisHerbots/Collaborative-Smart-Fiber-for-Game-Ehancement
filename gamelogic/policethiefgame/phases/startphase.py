@@ -1,9 +1,9 @@
 from gamelogic.policethiefgame.models.playermodel import PlayerType
 
 
-def on_button_clicked(id, entity, duration, players, counts):
+def on_button_clicked(button, entity, players, counts):
     for player in players:
-        if player.id == entity["id"]:
+        if player.id == entity["ipv4_address"]:
             switch_player_team(player, counts)
 
 

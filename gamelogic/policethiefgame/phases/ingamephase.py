@@ -1,9 +1,9 @@
 from gamelogic.policethiefgame.models.playermodel import PlayerType
 
 
-def on_button_clicked(id, entity, duration, players, engine):
+def on_button_clicked(button, entity, players, engine):
     for player in players:
-        if player.id == entity["id"] and player.type == PlayerType.THIEF:
+        if player.id == entity["ipv4_address"] and player.type == PlayerType.THIEF:
             on_thief_pressed(player, players, engine)
     # Check if police or thief and call the right methods
     pass

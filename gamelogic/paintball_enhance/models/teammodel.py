@@ -1,8 +1,8 @@
 
 class Team:
-    players = []
 
     def __init__(self):
+        self.players = []
         pass
 
     def add_player(self, player):

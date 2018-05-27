@@ -9,20 +9,23 @@ class Phase:
     INGAMEPHASE = 2
 
 
-engine = Engine("PaintBall", test_setup=True)
+engine = Engine("PaintBall")
 team1 = Team()
 team2 = Team()
 active_phase = Phase.STARTPHASE
 
 
 @engine.register_trigger("on_entity_registered")
-def on_entity_registered(id):
+def on_entity_registered(entity):
     """
         When an entity is registered.
         Add the entity as models and put it in either the team1 or team2.
         :param entity:
         :return:
     """
+
+    id = entity["ipv4_address"]
+    print(id)
     # If the models is already registered in team1 or 2, there is probably a network fault.
     if team1.contains_player_with_id(id):
         return
@@ -38,15 +41,16 @@ def on_entity_registered(id):
     # Show team color for models
 
 
-@engine.register_trigger("button_clicked")
-def on_button_clicked(id, entity, duration):
+@engine.register_trigger("button_pressed")
+def on_button_clicked(button, entity):
+    id = entity["ipv4_address"]
     if active_phase == Phase.STARTPHASE:
-        switch_team_of_playerid(entity.id)
+        switch_team_of_playerid(id)
     elif active_phase == Phase.INGAMEPHASE:
-        buttontype = buttons.get_button_type(id)
-        if team1.contains_player_with_id(entity.id):
+        buttontype = buttons.get_button_type(button)
+        if team1.contains_player_with_id(id):
             buttons.execute_button(buttontype, entity, engine, team1)
-        elif team2.contains_player_with_id(entity.id):
+        elif team2.contains_player_with_id(id):
             buttons.execute_button(buttontype, entity, engine, team2)
 
 

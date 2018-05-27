@@ -13,7 +13,7 @@ class Phase(Enum):
     ENDPHASE = 3
 
 
-engine = Engine("PoliceThief", test_setup= True)
+engine = Engine("PoliceThief")
 # A list of players of type PlayerModel
 players = []
 # Map counts of models teams: thiefs, policemen
@@ -42,13 +42,14 @@ def game_timer_ended():
 
 
 @engine.register_trigger("on_entity_registered")
-def on_entity_registered(id):
+def on_entity_registered(entity):
     """
         When an entity is registered.
         Add the entity as models and put it in either the team of policemen or thiefs.
     :param entity:
     :return:
     """
+    id = entity["ipv4_address"]
     # If the models is already registered, there is probably a network fault.
     for player in players:
         if player.id == id:
@@ -86,10 +87,10 @@ def on_game_ended():
     endphase.showEndGameState(thieves_won)
 
 
-@engine.register_trigger("button_clicked")
-def on_button_clicked(id, entity, duration):
+@engine.register_trigger("button_pressed")
+def on_button_clicked(button, entity):
     if activePhase == Phase.STARTPHASE:
-        startphase.on_button_clicked(id, entity, duration, players, counts)
+        startphase.on_button_clicked(button, entity, players, counts)
     elif activePhase == Phase.INGAMEPHASE:
-        ingamephase.on_button_clicked(id, entity, duration, players, engine)
+        ingamephase.on_button_clicked(button, entity, players, engine)
 
