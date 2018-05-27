@@ -47,7 +47,7 @@ class Engine:
         Thread(target=self._process_events).start()
 
         # Only do an immediate shutdown of all interfaces when in a test_setup is run
-        if test_setup:
+        if _test_setup:
             self.cleanup_interfaces()
 
     def cleanup_interfaces(self):

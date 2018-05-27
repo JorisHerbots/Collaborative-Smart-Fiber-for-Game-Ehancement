@@ -1,4 +1,4 @@
-from engine import Engine, hardwaremanager
+from engine import Engine, hardwaremanager, entitymanager
 import requests
 from engine.hardware import led, vibration_motor, three_button
 
@@ -32,3 +32,18 @@ def test_registration():
     except Exception:
         e.cleanup_interfaces()
         raise
+
+
+def test_command_backlog():
+    entity = entitymanager.Entity("127.0.0.1", "0|0\n1|1")
+    assert len(entity.pop_all_command()) == 0
+
+    entity.send_command("c_1")
+    entity.send_command("c_2")
+    entity.send_command("c_3")
+    entity.send_command("c_4")
+    commands = entity.pop_all_command()
+    assert len(commands) == 4
+    assert len(entity.pop_all_command()) == 0
+    for i in range(1,5):
+        assert commands[i-1] == "c_{}".format(i)

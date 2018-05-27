@@ -1,4 +1,5 @@
 from .logger import initiate_logger
+from threading import Lock
 from . import config
 
 
@@ -29,7 +30,11 @@ class Entity:
         self.ipv4_address = str(ipv4_address)
         self.connected_components = {}
         self._unique_id_to_module_id = {}
-        components = str(raw_registration_string).split("\n")
+
+        self._command_backlog_mutex = Lock()
+        self._command_backlog = []
+
+        components = str(raw_registration_string).replace("\\n", "\n").split("\n")
         try:
             for component in components:
                 module_id, unique_id = component.split('|')
@@ -46,6 +51,16 @@ class Entity:
         except ValueError:
             raise MalformedRegisterPayloadException("Given payload contains malformed data | {}"
                                                     .format(raw_registration_string))
+
+    def send_command(self, command):
+        with self._command_backlog_mutex:
+            self._command_backlog.append(str(command))
+
+    def pop_all_command(self):
+        with self._command_backlog_mutex:
+            backlog_copy = self._command_backlog
+            self._command_backlog = []
+        return backlog_copy
 
     def __repr__(self):
         return self.__str__()
