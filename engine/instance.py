@@ -49,7 +49,8 @@ class Engine:
         # HTTP server instance
         self.http_server_instance = httpserver.run_server(self.configuration_parser_instance.configuration_queue,
                                                           self.entitymanager_interface,
-                                                          self._start_game, self._is_game_running, host, port)
+                                                          self._start_game, self._is_game_running,
+                                                          self.initiate_event, host, port)
         # TODO PARAMS HERE (Given @ boot??)
 
         self.logger.info("Engine initialised | Game name: \"{}\"".format(str(game_name)))
@@ -149,7 +150,7 @@ class Engine:
         Signal certain interfaces they can advance in their processing
         """
         self.phase = self.EngineState.RUNNING_PHASE
-        self.initiate_event("game_start", {})
+        self.initiate_event("game_started", {})
 
     def end_game(self):
         """Signal halt to Engine

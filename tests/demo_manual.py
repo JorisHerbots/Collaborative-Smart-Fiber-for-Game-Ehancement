@@ -24,3 +24,17 @@ def press(**kwargs):
         print("Button released")
         for key, value in kwargs.items():
                 print("%s = %s" % (key, value))
+
+
+@app.register_trigger("game_started")
+def gamestart(**kwargs):
+        print("Game started")
+        for key, value in kwargs.items():
+                print("%s = %s" % (key, value))
+
+
+@app.register_trigger("entity_registered")
+def press(**kwargs):
+        print("Entity registered")
+        for key, value in kwargs.items():
+                print("%s = %s" % (key, value))

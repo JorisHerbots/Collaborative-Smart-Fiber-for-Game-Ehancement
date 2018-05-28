@@ -7,7 +7,8 @@ from . import config, entitymanager
 _logger = initiate_logger(__name__, config.debug)
 
 
-def create_handler_class_with_queue(queue, entitymanager_interface, game_start_call, is_game_running_call):
+def create_handler_class_with_queue(queue, entitymanager_interface, game_start_call,
+                                    is_game_running_call, new_entity_event):
     class EngineHTTPHandler(BaseHTTPRequestHandler):
         """Engine HTTP Server
 
@@ -65,18 +66,18 @@ def create_handler_class_with_queue(queue, entitymanager_interface, game_start_c
             # Client IPV4 address (TODO: We assume IPV4 as internet protocol)
             client_ipv4 = self.client_address[0]
 
-            # Seperate internal messages (TODO: Find better way to accomplish this)
+            # Separate internal messages (TODO: Find better way to accomplish this)
             if client_ipv4 == "127.0.0.1" and payload_as_string == "START_GAME" and not is_game_running_call():
                 self._game_start_call()
                 self._set_headers(200)
                 self.wfile.write(b"Game switched to RUNNING phase.")
                 return
 
-            print(is_game_running_call())
-
             if not is_game_running_call() and not self.entitymanager_interface.does_entity_exist(client_ipv4):
                 try:
                     self.entitymanager_interface.register_entity(client_ipv4, payload_as_string)
+                    new_entity_event("entity_registered",
+                                     {"entity": self.entitymanager_interface.known_entities.get(client_ipv4)})
                     self._set_headers(200)
                     self.wfile.write(b"new entity registered")
                 except entitymanager.EntityRegistrationException as e:
@@ -92,7 +93,7 @@ def create_handler_class_with_queue(queue, entitymanager_interface, game_start_c
 
 
 def run_server(configuration_queue, entitymanager_interface, game_start_call,
-               is_game_running_call, host ='127.0.0.1', port=8080):
+               is_game_running_call, new_entity_event, host ='127.0.0.1', port=8080):
     """Setup and run the server in a serve forever modus
 
     To stop the server, a shutdown needs to be issued.
@@ -107,7 +108,8 @@ def run_server(configuration_queue, entitymanager_interface, game_start_call,
     """
     _logger.info("Initialising Engine HTTP server in separate thread.")
     server = HTTPServer((host, port), create_handler_class_with_queue(configuration_queue, entitymanager_interface,
-                                                                      game_start_call, is_game_running_call))
+                                                                      game_start_call, is_game_running_call,
+                                                                      new_entity_event))
     Thread(target=server.serve_forever).start()
     return server
 
