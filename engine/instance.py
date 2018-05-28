@@ -3,6 +3,8 @@ from .entitymanager import EntityManager
 from . import config, logger, httpserver, configuration_parser
 from queue import Queue
 from threading import Thread
+from enum import Enum
+import time
 
 
 class InvalidTriggerException(Exception):
@@ -10,7 +12,15 @@ class InvalidTriggerException(Exception):
 
 
 class Engine:
-    def __init__(self, game_name="Unknown", _test_setup = False):
+    class EngineState(Enum):
+        REGISTER_PHASE = 0
+        RUNNING_PHASE = 1
+        END_PHASE = 2
+
+    def __init__(self, game_name="Unknown", host="127.0.0.1", port=8080, _test_setup = False):
+        # Phase the engine is currently in
+        self.phase = self.EngineState.REGISTER_PHASE
+
         # Game Name this Engine represents
         self.game_name = str(game_name)
 
@@ -38,7 +48,9 @@ class Engine:
 
         # HTTP server instance
         self.http_server_instance = httpserver.run_server(self.configuration_parser_instance.configuration_queue,
-                                                          self.entitymanager_interface)
+                                                          self.entitymanager_interface,
+                                                          self._start_game, self._is_game_running,
+                                                          self.initiate_event, host, port)
         # TODO PARAMS HERE (Given @ boot??)
 
         self.logger.info("Engine initialised | Game name: \"{}\"".format(str(game_name)))
@@ -48,9 +60,9 @@ class Engine:
 
         # Only do an immediate shutdown of all interfaces when in a test_setup is run
         if _test_setup:
-            self.cleanup_interfaces()
+            self.end_game()
 
-    def cleanup_interfaces(self):
+    def _cleanup_interfaces(self):
         self.logger.info("Cleaning up Engine interfaces running on separate threads.")
         httpserver.stop_server(self.http_server_instance)
         configuration_parser.stop_queue_processing(self.configuration_parser_instance)
@@ -121,3 +133,29 @@ class Engine:
                 except TypeError:
                     self.logger.error("{} does not accept the given arguments {} for event \"{}\""
                                       .format(trigger, event_args, event_name))
+
+    def _is_game_running(self):
+        """Way for interfaces to retrieve game state info
+
+        Note: Only used by server due to weird way HTTPServer works with its handlers
+        TODO: Find better way for sharing this information
+
+        :return: boolean
+        """
+        return self.phase == self.EngineState.RUNNING_PHASE
+
+    def _start_game(self):
+        """Set the engine into running phase
+
+        Signal certain interfaces they can advance in their processing
+        """
+        self.phase = self.EngineState.RUNNING_PHASE
+        self.initiate_event("game_started", {})
+
+    def end_game(self):
+        """Signal halt to Engine
+
+        All interfaces will stop working upon issuing this request
+        """
+        self.phase = self.EngineState.END_PHASE
+        self._cleanup_interfaces()

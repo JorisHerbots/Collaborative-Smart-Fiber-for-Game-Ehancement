@@ -56,6 +56,9 @@ class PremadeVibrationPatterns(Enum):
     THREE_SHORT_BLIPS = VibrationPattern("10101", 300)
     THREE_LONG_BLIPS = VibrationPattern("11011011", 300)
 
+    SOS = VibrationPattern("10101011101110111010101", 75)
+    GO_GO_POWER_RANGERS = VibrationPattern("111111001100110100110011", 75)
+
 
 def vibrate(vibration_config, repetitions=1):
     """Create a vibrate command based on the given VibrationPattern object
