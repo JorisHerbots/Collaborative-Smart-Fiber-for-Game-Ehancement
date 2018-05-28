@@ -4,7 +4,7 @@ import signal
 
 
 def signal_handler(signal, frame):
-        app.cleanup_interfaces()
+        app._cleanup_interfaces()
         sys.exit(0)
 
 

@@ -4,6 +4,8 @@
     - Params: entity, button
 - button_released
     - Params: entity, button, duration
+- game_start
+    - Params: None
 
 ## Tips
 Python has no concept to hide/protect object data. This can be abused within the framework.

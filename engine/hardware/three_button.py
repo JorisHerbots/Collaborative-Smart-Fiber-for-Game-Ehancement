@@ -52,5 +52,6 @@ def parse_config(split_config):
     elif split_config[4] == "1":
         event_list.append(create_event_dictionary("button_released", {"button": ButtonId(split_config[2]),
                                                                       "duration": int(split_config[5])}))
+
     return event_list
 
