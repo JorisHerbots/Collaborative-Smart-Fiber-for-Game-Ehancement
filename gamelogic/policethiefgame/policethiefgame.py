@@ -18,7 +18,7 @@ engine = Engine("PoliceThief")
 players = []
 # Map counts of models teams: thiefs, policemen
 counts = [0,0]
-# The currently active phase that will decide the behavior of the system
+# The currently active phase that will decentitye the behavior of the system
 activePhase = Phase.STARTPHASE
 # The timer that keeps track of the current running game
 gametimer = None
@@ -49,18 +49,17 @@ def on_entity_registered(entity):
     :param entity:
     :return:
     """
-    id = entity["ipv4_address"]
     # If the models is already registered, there is probably a network fault.
     for player in players:
-        if player.id == id:
+        if player.entity == entity:
             return
 
     # When there are less thieves than policemen, the new models becomes a thief and vice versa.
     if counts[0] <= counts[1]:
-        players.append(PlayerModel(id, PlayerType.THIEF))
+        players.append(PlayerModel(entity, PlayerType.THIEF))
         counts[0] += 1
     else:
-        players.append(PlayerModel(id, PlayerType.POLICE))
+        players.append(PlayerModel(entity, PlayerType.POLICE))
         counts[1] += 1
     # Change leds of models to new color
 

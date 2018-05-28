@@ -1,6 +1,6 @@
 from engine import Engine
-from .models.playermodel import PlayerModel
-from .models.teammodel import Team
+from gamelogic.paintball_enhance.models.playermodel import PlayerModel
+from gamelogic.paintball_enhance.models.teammodel import Team
 import gamelogic.paintball_enhance.button_interactions as buttons
 
 
@@ -24,33 +24,30 @@ def on_entity_registered(entity):
         :return:
     """
 
-    id = entity["ipv4_address"]
-    print(id)
     # If the models is already registered in team1 or 2, there is probably a network fault.
-    if team1.contains_player_with_id(id):
+    if team1.contains_player_with_entity(entity):
         return
-    elif team2.contains_player_with_id(id):
+    elif team2.contains_player_with_entity(entity):
         return
 
     # When team1 has less players than team2, the new models becomes part of team1 and vice versa.
     if team1.size() <= team2.size():
-        team1.add_player(PlayerModel(id))
+        team1.add_player(PlayerModel(entity))
     else:
-        team2.add_player(PlayerModel(id))
+        team2.add_player(PlayerModel(entity))
 
     # Show team color for models
 
 
 @engine.register_trigger("button_pressed")
 def on_button_clicked(button, entity):
-    id = entity["ipv4_address"]
     if active_phase == Phase.STARTPHASE:
-        switch_team_of_playerid(id)
+        switch_team_of_player_entity(entity)
     elif active_phase == Phase.INGAMEPHASE:
         buttontype = buttons.get_button_type(button)
-        if team1.contains_player_with_id(id):
+        if team1.contains_player_with_entity(entity):
             buttons.execute_button(buttontype, entity, engine, team1)
-        elif team2.contains_player_with_id(id):
+        elif team2.contains_player_with_entity(entity):
             buttons.execute_button(buttontype, entity, engine, team2)
 
 
@@ -66,12 +63,12 @@ def on_game_ended():
     pass
 
 
-def switch_team_of_playerid(player_id):
-    if team1.contains_player_with_id(player_id):
-        player = team1.retrieve_player_with_id(player_id)
+def switch_team_of_player_entity(player_entity):
+    if team1.contains_player_with_entity(player_entity):
+        player = team1.retrieve_player_with_entity(player_entity)
         team2.add_player(player)
         team1.remove_player(player)
-    elif team2.contains_player_with_id(player_id):
-        player = team2.retrieve_player_with_id(player_id)
+    elif team2.contains_player_with_entity(player_entity):
+        player = team2.retrieve_player_with_entity(player_entity)
         team1.add_player(player)
         team2.remove_player(player)

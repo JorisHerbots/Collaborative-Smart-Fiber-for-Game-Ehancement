@@ -10,6 +10,6 @@ class PlayerType(Enum):
 # This class is for keeping data about a PlayerModel in the game
 class PlayerModel:
 
-    def __init__(self, id, type):
-        self.id = id
+    def __init__(self, entity, type):
+        self.entity = entity
         self.type = type

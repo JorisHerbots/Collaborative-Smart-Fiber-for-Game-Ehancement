@@ -1,3 +1,5 @@
+import engine.hardware.vibration_motor as vibration_motor
+
 class ButtonType:
     ATTACK = 1,
     DEFENSE = 2,
@@ -22,10 +24,18 @@ def get_button_type(button_id):
 def execute_button(button_type, entity, engine, team):
     if button_type == ButtonType.ATTACK:
         # Call attack mode vibrate for the whole team
-        pass
+        for player in team.players:
+            if player.entity != entity:
+                player.entity.send_command(vibration_motor.vibrate(vibration_motor.PremadeVibrationPatterns.TWO_LONG_BLIPS))
+
     elif button_type == ButtonType.DEFENSE:
         # Call defense mode vibrate for the whole team
-        pass
+        for player in team.players:
+            if player.entity != entity:
+                player.entity.send_command(vibration_motor.vibrate(vibration_motor.PremadeVibrationPatterns.THREE_SHORT_BLIPS))
+
     elif button_type == ButtonType.HIT:
         # Switch between hitted and not hitted for a player
-        pass
+        for player in team.players:
+            if player.entity != entity:
+                player.entity.send_command(vibration_motor.vibrate(vibration_motor.PremadeVibrationPatterns.SHORT_BLIP))
