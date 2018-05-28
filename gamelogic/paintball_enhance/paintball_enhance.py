@@ -15,8 +15,8 @@ team2 = Team()
 active_phase = Phase.STARTPHASE
 
 
-@engine.register_trigger("on_entity_registered")
-def on_entity_registered(entity):
+@engine.register_trigger("entity_registered")
+def entity_registered(entity):
     """
         When an entity is registered.
         Add the entity as models and put it in either the team1 or team2.

@@ -6,18 +6,18 @@ import time
 
 def test_players_registration():
     game.reset()
-    assert game.engine.event_triggers["on_entity_registered"][0] == game.on_entity_registered
-    game.engine.initiate_event("on_entity_registered", {"entity": {"ipv4_address": 0}})
-    game.engine.initiate_event("on_entity_registered", {"entity": {"ipv4_address": 1}})
+    assert game.engine.event_triggers["entity_registered"][0] == game.entity_registered
+    game.engine.initiate_event("entity_registered", {"entity": {"ipv4_address": 0}})
+    game.engine.initiate_event("entity_registered", {"entity": {"ipv4_address": 1}})
     time.sleep(1)
     assert len(game.players) == 2
     assert game.players[0].type != game.players[1].type
 
 def test_team_switch():
     game.reset()
-    game.engine.initiate_event("on_entity_registered", {"entity": {"ipv4_address": 0}})
-    game.engine.initiate_event("on_entity_registered", {"entity": {"ipv4_address": 1}})
-    game.engine.initiate_event("on_entity_registered", {"entity": {"ipv4_address": 2}})
+    game.engine.initiate_event("entity_registered", {"entity": {"ipv4_address": 0}})
+    game.engine.initiate_event("entity_registered", {"entity": {"ipv4_address": 1}})
+    game.engine.initiate_event("entity_registered", {"entity": {"ipv4_address": 2}})
     time.sleep(1)
     assert game.players[0].type == PlayerType.THIEF
     assert game.players[1].type == PlayerType.POLICE
@@ -50,9 +50,9 @@ def test_team_switch():
 
 def test_police_tapped():
     game.reset()
-    game.engine.initiate_event("on_entity_registered", {"entity": {"ipv4_address": 0}})
-    game.engine.initiate_event("on_entity_registered", {"entity": {"ipv4_address": 1}})
-    game.engine.initiate_event("on_entity_registered", {"entity": {"ipv4_address": 2}})
+    game.engine.initiate_event("entity_registered", {"entity": {"ipv4_address": 0}})
+    game.engine.initiate_event("entity_registered", {"entity": {"ipv4_address": 1}})
+    game.engine.initiate_event("entity_registered", {"entity": {"ipv4_address": 2}})
     time.sleep(1)
     assert game.players[1].type == PlayerType.POLICE
     game.engine.initiate_event("game_started", {})
@@ -65,9 +65,9 @@ def test_police_tapped():
 def test_gameplay_thiefs_caught():
     game.reset()
     # Engine players registration phase
-    game.engine.initiate_event("on_entity_registered", {"entity": {"ipv4_address": 0}})
-    game.engine.initiate_event("on_entity_registered", {"entity": {"ipv4_address": 1}})
-    game.engine.initiate_event("on_entity_registered", {"entity": {"ipv4_address": 2}})
+    game.engine.initiate_event("entity_registered", {"entity": {"ipv4_address": 0}})
+    game.engine.initiate_event("entity_registered", {"entity": {"ipv4_address": 1}})
+    game.engine.initiate_event("entity_registered", {"entity": {"ipv4_address": 2}})
     time.sleep(1)
     assert game.activePhase == game.Phase.STARTPHASE
 

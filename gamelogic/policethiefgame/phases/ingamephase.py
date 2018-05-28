@@ -15,8 +15,8 @@ def on_thief_pressed(player, players, engine):
     # Use library to change color of the models and set the state
     for item in players:
         if item.type == PlayerType.THIEF:
-            item.entity.send_command(vibration_motor.vibrate(vibration_motor.PremadeVibrationPatterns.LONG_BLIP))
             found = True
+            item.entity.send_command(vibration_motor.vibrate(vibration_motor.PremadeVibrationPatterns.LONG_BLIP))
     if found:
         return
     # All thiefs are caught so endgame state is reached
