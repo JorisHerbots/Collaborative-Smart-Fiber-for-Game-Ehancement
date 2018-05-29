@@ -37,7 +37,7 @@ class Color:
 
     @property
     def r(self):
-        return self._value
+        return self._r
 
     @r.setter
     def r(self, value):
@@ -45,7 +45,7 @@ class Color:
 
     @property
     def g(self):
-        return self._value
+        return self._g
 
     @g.setter
     def g(self, value):
@@ -53,7 +53,7 @@ class Color:
 
     @property
     def b(self):
-        return self._value
+        return self._b
 
     @b.setter
     def b(self, value):
