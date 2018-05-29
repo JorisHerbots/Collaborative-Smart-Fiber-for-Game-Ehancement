@@ -50,24 +50,20 @@ def entity_registered(entity):
     :param entity:
     :return:
     """
-    try:
-        # If the models is already registered, there is probably a network fault.
-        for player in players:
-            if player.entity == entity:
-                return
+    # If the models is already registered, there is probably a network fault.
+    for player in players:
+        if player.entity == entity:
+            return
 
-        # When there are less thieves than policemen, the new models becomes a thief and vice versa.
-        if counts[0] <= counts[1]:
-            players.append(PlayerModel(entity, PlayerType.THIEF))
-            entity.send_command(led.solid_state(led.PredefinedColors.DARK_RED))
-            counts[0] += 1
-        else:
-            players.append(PlayerModel(entity, PlayerType.POLICE))
-            entity.send_command(led.solid_state(led.PredefinedColors.ALICE_BLUE))
-            counts[1] += 1
-    except:
-        pass
-
+    # When there are less thieves than policemen, the new models becomes a thief and vice versa.
+    if counts[0] <= counts[1]:
+        players.append(PlayerModel(entity, PlayerType.THIEF))
+        entity.send_command(led.solid_state(led.PredefinedColors.DARK_RED))
+        counts[0] += 1
+    else:
+        players.append(PlayerModel(entity, PlayerType.POLICE))
+        entity.send_command(led.solid_state(led.PredefinedColors.ALICE_BLUE))
+        counts[1] += 1
 
 
 @engine.register_trigger("game_started")
@@ -76,8 +72,9 @@ def on_game_started():
     activePhase = Phase.INGAMEPHASE
     if gametimer is not None:
         gametimer.cancel()
+
     # Run the game timer for 15 minutes
-    gametimer = thread.Timer(5, game_timer_ended)
+    gametimer = thread.Timer(900, game_timer_ended)
     for player in players:
         if player.type == PlayerType.POLICE:
             player.entity.send_command(led.blink(800, led.PredefinedColors.ALICE_BLUE, 800, led.PredefinedColors.RED))
@@ -92,7 +89,7 @@ def on_game_ended():
         gametimer.cancel()
     endphase.showEndGameState(thieves_won, players)
     # Wait 5 seconds to trigger end game on the engine
-    thread.Timer(5, trigger_engine_end)
+    thread.Timer(5, trigger_engine_end).start()
 
 
 def trigger_engine_end():
@@ -104,5 +101,7 @@ def on_button_clicked(button, entity):
     if activePhase == Phase.STARTPHASE:
         startphase.on_button_clicked(button, entity, players, counts)
     elif activePhase == Phase.INGAMEPHASE:
-        ingamephase.on_button_clicked(button, entity, players, engine)
+        ended = ingamephase.on_button_clicked(button, entity, players, engine)
+        if ended:
+            on_game_ended()
 
