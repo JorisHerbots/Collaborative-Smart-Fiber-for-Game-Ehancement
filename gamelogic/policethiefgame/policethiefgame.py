@@ -5,7 +5,7 @@ import gamelogic.policethiefgame.phases.endphase as endphase
 import gamelogic.policethiefgame.phases.ingamephase as ingamephase
 import threading as thread
 from engine import Engine
-
+import engine.hardware.led as led
 
 class Phase(Enum):
     STARTPHASE = 1
@@ -37,8 +37,9 @@ def reset():
 def game_timer_ended():
     print('Timer ended')
     # The timer of the game has ended and the thiefs haven't been caught, so thieves win!
+    thieves_won = True
     # Trigger end game
-    engine.initiate_event("game_ended", {})
+    on_game_ended()
 
 
 @engine.register_trigger("entity_registered")
@@ -49,19 +50,24 @@ def entity_registered(entity):
     :param entity:
     :return:
     """
-    # If the models is already registered, there is probably a network fault.
-    for player in players:
-        if player.entity == entity:
-            return
+    try:
+        # If the models is already registered, there is probably a network fault.
+        for player in players:
+            if player.entity == entity:
+                return
 
-    # When there are less thieves than policemen, the new models becomes a thief and vice versa.
-    if counts[0] <= counts[1]:
-        players.append(PlayerModel(entity, PlayerType.THIEF))
-        counts[0] += 1
-    else:
-        players.append(PlayerModel(entity, PlayerType.POLICE))
-        counts[1] += 1
-    # Change leds of models to new color
+        # When there are less thieves than policemen, the new models becomes a thief and vice versa.
+        if counts[0] <= counts[1]:
+            players.append(PlayerModel(entity, PlayerType.THIEF))
+            entity.send_command(led.solid_state(led.PredefinedColors.DARK_RED))
+            counts[0] += 1
+        else:
+            players.append(PlayerModel(entity, PlayerType.POLICE))
+            entity.send_command(led.solid_state(led.PredefinedColors.ALICE_BLUE))
+            counts[1] += 1
+    except:
+        pass
+
 
 
 @engine.register_trigger("game_started")
@@ -72,18 +78,25 @@ def on_game_started():
         gametimer.cancel()
     # Run the game timer for 15 minutes
     gametimer = thread.Timer(5, game_timer_ended)
-
-    print("Timer started.")
+    for player in players:
+        if player.type == PlayerType.POLICE:
+            player.entity.send_command(led.blink(800, led.PredefinedColors.ALICE_BLUE, 800, led.PredefinedColors.RED))
     gametimer.start()
 
 
-@engine.register_trigger("game_ended")
 def on_game_ended():
     global activePhase
     activePhase = Phase.ENDPHASE
+    # If the thieves haven't won, that means the gametimer is still active
     if not thieves_won:
         gametimer.cancel()
-    endphase.showEndGameState(thieves_won)
+    endphase.showEndGameState(thieves_won, players)
+    # Wait 5 seconds to trigger end game on the engine
+    thread.Timer(5, trigger_engine_end)
+
+
+def trigger_engine_end():
+    engine.end_game()
 
 
 @engine.register_trigger("button_pressed")

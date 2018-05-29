@@ -1,5 +1,6 @@
 from gamelogic.policethiefgame.models.playermodel import PlayerType
 import engine.hardware.vibration_motor as vibration_motor
+import engine.hardware.led as led
 
 def on_button_clicked(button, entity, players, engine):
     for player in players:
@@ -11,8 +12,8 @@ def on_button_clicked(button, entity, players, engine):
 
 def on_thief_pressed(player, players, engine):
     player.type = PlayerType.CAUGHT
+    player.entity.send_command(led.solid_state(led.PredefinedColors.LIGHT_GOLDENROD_YELLOW))
     found = False
-    # Use library to change color of the models and set the state
     for item in players:
         if item.type == PlayerType.THIEF:
             found = True
