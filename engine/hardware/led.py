@@ -63,7 +63,7 @@ class Color:
         return "{},{},{}".format(self.r, self.g, self.b)
 
 
-class PredefinedColors(Enum):
+class PredefinedColors:
     # Colors scraped from https://en.wikipedia.org/wiki/Web_colors#X11_color_names
     OFF = Color(0, 0, 0) # Black is the "off" color
     PINK = Color(255, 192, 203)
