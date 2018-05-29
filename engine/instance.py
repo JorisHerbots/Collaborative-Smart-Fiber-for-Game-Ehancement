@@ -128,7 +128,7 @@ class Engine:
             for trigger in triggers:
                 try:
                     self.logger.debug("Initiating trigger [{}] for event [{}] with parameters [{}]"
-                                      .format(trigger, event_args, event_name))
+                                      .format(trigger, event_name, event_args))
                     trigger(**event_args)
                 except TypeError:
                     self.logger.error("{} does not accept the given arguments {} for event \"{}\""

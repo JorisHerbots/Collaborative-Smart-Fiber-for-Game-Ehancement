@@ -60,7 +60,7 @@ class Entity:
             raise MalformedRegisterPayloadException("Given payload contains malformed data | {}"
                                                     .format(raw_registration_string))
 
-    def send_command(self, command, module_id):
+    def send_command(self, command, module_id = None):
         """Send command to client
 
         Will append command (as a string) to the backlog of build up commands.
@@ -71,6 +71,12 @@ class Entity:
         :param module_id: id from module given command was generated from; entity will search for corresponding uniqueID
         :param command: Command in the form of a string (Advised to use hardware modules to generate these commands)
         """
+
+        # Enable a way so the developer can send the set from hardware modules directly
+        if not module_id:
+            module_id = command[1]
+            command = command[0]
+
         full_command = "{}|{}".format(self.get_unique_id_from_module_id(module_id), command)
 
         with self._command_backlog_mutex:
