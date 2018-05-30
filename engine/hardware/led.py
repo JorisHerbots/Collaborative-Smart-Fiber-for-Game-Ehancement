@@ -30,10 +30,9 @@ class Color:
         self.g = g
         self.b = b
 
-    def _set_color(self, color, value):
+    def _check_color(self, value):
         if value < 0 or value > 255:
             raise InvalidColorValue("Color value has to be an integer in the range [0,255] | Given {}".format(value))
-        color = value
 
     @property
     def r(self):
@@ -41,7 +40,8 @@ class Color:
 
     @r.setter
     def r(self, value):
-        self._set_color(self._r, value)
+        self._check_color(value)
+        self._r = value
 
     @property
     def g(self):
@@ -49,7 +49,8 @@ class Color:
 
     @g.setter
     def g(self, value):
-        self._set_color(self._g, value)
+        self._check_color(value)
+        self._g = value
 
     @property
     def b(self):
@@ -57,9 +58,13 @@ class Color:
 
     @b.setter
     def b(self, value):
-        self._set_color(self._b, value)
+        self._check_color(value)
+        self._b = value
 
     def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
         return "{},{},{}".format(self.r, self.g, self.b)
 
 
