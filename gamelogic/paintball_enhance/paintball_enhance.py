@@ -9,7 +9,7 @@ class Phase:
     INGAMEPHASE = 2
 
 
-engine = Engine("PaintBall")
+engine = Engine("PaintBall", host="0.0.0.0")
 team1 = Team(led.PredefinedColors.BLUE)
 team2 = Team(led.PredefinedColors.GREEN)
 active_phase = Phase.STARTPHASE
