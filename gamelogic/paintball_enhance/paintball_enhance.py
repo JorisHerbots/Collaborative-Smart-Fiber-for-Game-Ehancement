@@ -2,7 +2,7 @@ from engine import Engine
 from gamelogic.paintball_enhance.models.playermodel import PlayerModel
 from gamelogic.paintball_enhance.models.teammodel import Team
 import gamelogic.paintball_enhance.button_interactions as buttons
-
+import engine.hardware.led as led
 
 class Phase:
     STARTPHASE = 1,
@@ -10,14 +10,14 @@ class Phase:
 
 
 engine = Engine("PaintBall")
-team1 = Team()
-team2 = Team()
+team1 = Team(led.PredefinedColors.BLUE)
+team2 = Team(led.PredefinedColors.GREEN)
 active_phase = Phase.STARTPHASE
 
 def reset():
     global team1, team2, active_phase
-    team1 = Team()
-    team2 = Team()
+    team1 = Team(led.PredefinedColors.BLUE)
+    team2 = Team(led.PredefinedColors.GREEN)
     active_phase = Phase.STARTPHASE
 
 
@@ -35,13 +35,14 @@ def entity_registered(entity):
         return
     elif team2.contains_player_with_entity(entity):
         return
-    print("team1 size:" + str(team1.size()))
-    print("team2 size:" + str(team2.size()))
+
     # When team1 has less players than team2, the new models becomes part of team1 and vice versa.
     if team1.size() <= team2.size():
         team1.add_player(PlayerModel(entity))
+        entity.send_command(led.solid_state(team1.color))
     else:
         team2.add_player(PlayerModel(entity))
+        entity.send_command(led.solid_state(team2.color))
 
     # Show team color for models
 

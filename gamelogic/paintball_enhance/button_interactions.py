@@ -37,6 +37,11 @@ def execute_button(button_type, entity, engine, team):
     elif button_type == ButtonType.HIT:
         # Switch between hitted and not hitted for a player
         for player in team.players:
-            if player.entity != entity:
-                player.entity.send_command(led.solid_state(led.PredefinedColors.INDIAN_RED))
-                player.entity.send_command(vibration_motor.vibrate(vibration_motor.PremadeVibrationPatterns.SHORT_BLIP))
+            if player.entity == entity:
+                if not player.hitted:
+                    entity.send_command(led.solid_state(led.PredefinedColors.INDIAN_RED))
+                    player.hitted = True
+                else:
+                    entity.send_command(led.solid_state(team.color))
+                    player.hitted = False
+                entity.send_command(vibration_motor.vibrate(vibration_motor.PremadeVibrationPatterns.SHORT_BLIP))
