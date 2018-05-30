@@ -28,7 +28,7 @@ def create_handler_class_with_queue(queue, entitymanager_interface, game_start_c
             :param response_code: HTTP code
             """
             self.send_response(response_code)
-            self.send_header('Content-type', 'application/plain')
+            self.send_header('Content-type', 'text/plain;charset=UTF-8')
             self.end_headers()
 
         def do_GET(self):
