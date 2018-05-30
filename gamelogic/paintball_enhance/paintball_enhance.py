@@ -74,7 +74,9 @@ def switch_team_of_player_entity(player_entity):
         player = team1.retrieve_player_with_entity(player_entity)
         team2.add_player(player)
         team1.remove_player(player)
+        player_entity.send_command(led.solid_state(team2.color))
     elif team2.contains_player_with_entity(player_entity):
         player = team2.retrieve_player_with_entity(player_entity)
         team1.add_player(player)
         team2.remove_player(player)
+        player_entity.send_command(led.solid_state(team1.color))
