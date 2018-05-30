@@ -52,7 +52,7 @@ def on_button_clicked(button, entity):
     if active_phase == Phase.STARTPHASE:
         switch_team_of_player_entity(entity)
     elif active_phase == Phase.INGAMEPHASE:
-        buttontype = buttons.get_button_type(button)
+        buttontype = buttons.get_button_type(int(button.value))
         if team1.contains_player_with_entity(entity):
             buttons.execute_button(buttontype, entity, engine, team1)
         elif team2.contains_player_with_entity(entity):

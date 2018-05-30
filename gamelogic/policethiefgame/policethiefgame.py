@@ -13,7 +13,7 @@ class Phase(Enum):
     ENDPHASE = 3
 
 
-engine = Engine("PoliceThief")
+engine = Engine("PoliceThief", host="0.0.0.0")
 # A list of players of type PlayerModel
 players = []
 # Map counts of models teams: thiefs, policemen

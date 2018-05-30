@@ -1,9 +1,10 @@
 import engine.hardware.vibration_motor as vibration_motor
 import engine.hardware.led as led
+
 class ButtonType:
-    ATTACK = 1,
-    DEFENSE = 2,
-    HIT = 3
+    ATTACK = 0
+    DEFENSE = 1
+    HIT = 2
 
 
 def get_button_type(button_id):
