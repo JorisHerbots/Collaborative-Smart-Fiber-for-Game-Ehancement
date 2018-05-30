@@ -1,5 +1,5 @@
 import engine.hardware.vibration_motor as vibration_motor
-
+import engine.hardware.led as led
 class ButtonType:
     ATTACK = 1,
     DEFENSE = 2,
@@ -38,4 +38,5 @@ def execute_button(button_type, entity, engine, team):
         # Switch between hitted and not hitted for a player
         for player in team.players:
             if player.entity != entity:
+                player.entity.send_command(led.solid_state(led.PredefinedColors.INDIAN_RED))
                 player.entity.send_command(vibration_motor.vibrate(vibration_motor.PremadeVibrationPatterns.SHORT_BLIP))

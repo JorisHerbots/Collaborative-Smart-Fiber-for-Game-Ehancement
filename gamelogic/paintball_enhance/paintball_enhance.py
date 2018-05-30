@@ -14,6 +14,12 @@ team1 = Team()
 team2 = Team()
 active_phase = Phase.STARTPHASE
 
+def reset():
+    global team1, team2, active_phase
+    team1 = Team()
+    team2 = Team()
+    active_phase = Phase.STARTPHASE
+
 
 @engine.register_trigger("entity_registered")
 def entity_registered(entity):
@@ -29,7 +35,8 @@ def entity_registered(entity):
         return
     elif team2.contains_player_with_entity(entity):
         return
-
+    print("team1 size:" + str(team1.size()))
+    print("team2 size:" + str(team2.size()))
     # When team1 has less players than team2, the new models becomes part of team1 and vice versa.
     if team1.size() <= team2.size():
         team1.add_player(PlayerModel(entity))
@@ -57,9 +64,7 @@ def on_game_started():
     active_phase = Phase.INGAMEPHASE
 
 
-@engine.register_trigger("game_ended")
 def on_game_ended():
-    # Reset state of all players of hit to non-hit
     pass
 
 
