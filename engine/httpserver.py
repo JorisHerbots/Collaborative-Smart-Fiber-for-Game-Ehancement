@@ -22,13 +22,15 @@ def create_handler_class_with_queue(queue, entitymanager_interface, game_start_c
 
             super(EngineHTTPHandler, self).__init__(*args, **kwargs)
 
-        def _set_headers(self, response_code=200):
+        def _set_headers(self, response_code=200, content_length=-1):
             """Set HTTP headers before issuing a response
 
             :param response_code: HTTP code
             """
             self.send_response(response_code)
             self.send_header('Content-type', 'text/plain;charset=UTF-8')
+            if content_length >= 0:
+                self.send_header("Content-Length", content_length)
             self.end_headers()
 
         def do_GET(self):
@@ -48,11 +50,9 @@ def create_handler_class_with_queue(queue, entitymanager_interface, game_start_c
 
             commands = self.entitymanager_interface.known_entities.get(client_ipv4).pop_all_command()
             commands_as_string = "\n".join(commands)
-            self._set_headers(200)
-
             data = commands_as_string.encode()
-            self.send_header("Content-Length", len(data))
-            self.wfile.write()
+            self._set_headers(response_code=200, content_length=len(data))
+            self.wfile.write(data)
 
         def do_POST(self):
             """HTTP POST requests
