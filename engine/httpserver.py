@@ -49,7 +49,10 @@ def create_handler_class_with_queue(queue, entitymanager_interface, game_start_c
             commands = self.entitymanager_interface.known_entities.get(client_ipv4).pop_all_command()
             commands_as_string = "\n".join(commands)
             self._set_headers(200)
-            self.wfile.write(commands_as_string.encode())
+
+            data = commands_as_string.encode()
+            self.send_header("Content-Length", len(data))
+            self.wfile.write()
 
         def do_POST(self):
             """HTTP POST requests
