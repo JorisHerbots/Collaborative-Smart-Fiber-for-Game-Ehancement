@@ -9,7 +9,7 @@ def signal_handler(signal, frame):
 
 
 signal.signal(signal.SIGINT, signal_handler)
-app = Engine("Manual Test Setup :D")
+app = Engine("Manual Test Setup :D", host="0.0.0.0", port="25500")
 
 
 @app.register_trigger("button_pressed")

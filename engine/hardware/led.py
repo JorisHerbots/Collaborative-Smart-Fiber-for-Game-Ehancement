@@ -37,7 +37,7 @@ class Color:
 
     @property
     def r(self):
-        return self._value
+        return self._r
 
     @r.setter
     def r(self, value):
@@ -45,7 +45,7 @@ class Color:
 
     @property
     def g(self):
-        return self._value
+        return self._g
 
     @g.setter
     def g(self, value):
@@ -53,7 +53,7 @@ class Color:
 
     @property
     def b(self):
-        return self._value
+        return self._b
 
     @b.setter
     def b(self, value):
@@ -63,7 +63,7 @@ class Color:
         return "{},{},{}".format(self.r, self.g, self.b)
 
 
-class PredefinedColors(Enum):
+class PredefinedColors:
     # Colors scraped from https://en.wikipedia.org/wiki/Web_colors#X11_color_names
     OFF = Color(0, 0, 0) # Black is the "off" color
     PINK = Color(255, 192, 203)

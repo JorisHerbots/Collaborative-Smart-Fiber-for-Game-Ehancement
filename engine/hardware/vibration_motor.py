@@ -48,7 +48,7 @@ class VibrationPattern:
         self._pattern = value
 
 
-class PremadeVibrationPatterns(Enum):
+class PremadeVibrationPatterns:
     SHORT_BLIP = VibrationPattern("1", 300)
     LONG_BLIP = VibrationPattern("1", 1500)
     TWO_SHORT_BLIPS = VibrationPattern("101", 300)

@@ -4,10 +4,10 @@ from engine.hardware import led, vibration_motor, three_button
 
 
 def test_registration():
-    e = Engine("entitymanager test", port=8082)
+    e = Engine("entitymanager test", port=8095)
     try:
 
-        r1 = requests.post("http://127.0.0.1:8082", "0|0\n1|1\n0|2")
+        r1 = requests.post("http://127.0.0.1:8095", "0|0\n1|1\n0|2")
         print(r1.text)
         assert r1.status_code == 200
         assert len(e.entitymanager_interface.known_entities) == 1
