@@ -245,7 +245,7 @@ def blink(interval_1, color_1, interval_2, color_2, repetitions=0):
     :param repetitions: amount of times the blinking needs to happen; 0 = forever
     :return: command string and module ID
     """
-    command = "2|{}|{}|{}|{}|{}".format(interval_1, color_1, interval_2, color_2)
+    command = "2|{}|{}|{}|{}|{}".format(repetitions, interval_1, color_1, interval_2, color_2)
 
 
 class _LedPattern:
