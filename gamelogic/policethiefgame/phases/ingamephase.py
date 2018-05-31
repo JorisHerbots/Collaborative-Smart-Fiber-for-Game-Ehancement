@@ -13,7 +13,7 @@ def on_button_clicked(button, entity, players, engine):
 
 def on_thief_pressed(player, players, engine):
     player.type = PlayerType.CAUGHT
-    player.entity.send_command(led.solid_state(led.PredefinedColors.LIGHT_GOLDENROD_YELLOW))
+    player.entity.send_command(led.solid_state(led.PredefinedColors.GREEN))
     found = False
     for item in players:
         if item.type == PlayerType.THIEF:

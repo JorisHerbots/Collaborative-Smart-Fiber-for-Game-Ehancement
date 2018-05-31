@@ -3,6 +3,7 @@ from gamelogic.paintball_enhance.models.playermodel import PlayerModel
 from gamelogic.paintball_enhance.models.teammodel import Team
 import gamelogic.paintball_enhance.button_interactions as buttons
 import engine.hardware.led as led
+import threading as thread
 
 class Phase:
     STARTPHASE = 1,
@@ -63,9 +64,12 @@ def on_button_clicked(button, entity):
 def on_game_started():
     global active_phase
     active_phase = Phase.INGAMEPHASE
-
+    # Run the game timer for 15 minutes
+    gametimer = thread.Timer(60, on_game_ended)
+    gametimer.start()
 
 def on_game_ended():
+    engine.end_game()
     pass
 
 

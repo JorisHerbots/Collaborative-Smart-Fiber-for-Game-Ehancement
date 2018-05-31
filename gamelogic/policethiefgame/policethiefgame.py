@@ -1,5 +1,5 @@
 from enum import Enum
-from .models.playermodel import PlayerModel, PlayerType
+from gamelogic.policethiefgame.models.playermodel import PlayerModel, PlayerType
 import gamelogic.policethiefgame.phases.startphase as startphase
 import gamelogic.policethiefgame.phases.endphase as endphase
 import gamelogic.policethiefgame.phases.ingamephase as ingamephase
@@ -35,6 +35,7 @@ def reset():
 
 
 def game_timer_ended():
+    global thieves_won
     print('Timer ended')
     # The timer of the game has ended and the thiefs haven't been caught, so thieves win!
     thieves_won = True
@@ -69,16 +70,19 @@ def entity_registered(entity):
 @engine.register_trigger("game_started")
 def on_game_started():
     global gametimer, activePhase
-    activePhase = Phase.INGAMEPHASE
-    if gametimer is not None:
-        gametimer.cancel()
+    try:
+        activePhase = Phase.INGAMEPHASE
+        if gametimer is not None:
+            gametimer.cancel()
 
-    # Run the game timer for 15 minutes
-    gametimer = thread.Timer(900, game_timer_ended)
-    for player in players:
-        if player.type == PlayerType.POLICE:
-            player.entity.send_command(led.blink(800, led.PredefinedColors.ALICE_BLUE, 800, led.PredefinedColors.RED))
-    gametimer.start()
+        # Run the game timer for 15 minutes
+        gametimer = thread.Timer(8, game_timer_ended)
+        for player in players:
+            if player.type == PlayerType.POLICE:
+                player.entity.send_command(led.blink(800, led.PredefinedColors.ALICE_BLUE, 800, led.PredefinedColors.RED))
+        gametimer.start()
+    except TypeError as e:
+        raise Exception(e)
 
 
 def on_game_ended():

@@ -40,7 +40,7 @@ def execute_button(button_type, entity, engine, team):
         for player in team.players:
             if player.entity == entity:
                 if not player.hitted:
-                    entity.send_command(led.solid_state(led.PredefinedColors.INDIAN_RED))
+                    entity.send_command(led.solid_state(led.PredefinedColors.RED))
                     player.hitted = True
                 else:
                     entity.send_command(led.solid_state(team.color))
