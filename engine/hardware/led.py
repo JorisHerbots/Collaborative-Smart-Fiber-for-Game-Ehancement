@@ -251,6 +251,7 @@ def blink(interval_1, color_1, interval_2, color_2, repetitions=0):
     :return: command string and module ID
     """
     command = "2|{}|{}|{}|{}|{}".format(repetitions, interval_1, color_1, interval_2, color_2)
+    return command, _name_id
 
 
 class _LedPattern:
