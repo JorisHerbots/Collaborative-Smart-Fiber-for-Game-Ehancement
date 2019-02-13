@@ -1,5 +1,8 @@
 
-\.idea/
+.idea/
 venv
 *.pyc
-\.pytest_cache/
+.pytest_cache/
+.dist/
+.build/
+.Engine.egg-info/
